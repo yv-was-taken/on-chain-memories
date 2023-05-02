@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMemories } from "../hooks";
 import { OnChainActivityCategory } from "../types"
 
 type TokenData = {
@@ -30,6 +31,7 @@ const infoTitles: InfoTitles = {
 }
 
 function InfoBlock({content, currentSection}:InfoBlockProps ) {
+
 
     return(
         <div id="info-block-container" className="bg-gray-900 h-3/4 w-2/5 flex flex-col justify-between items-center text-white">
@@ -68,6 +70,20 @@ function InfoBlocks({currentPage, data}: InfoBlocksProps ) {
 
 export default function Info() {
     const [currentPage,setCurrentPage] = useState(1);
+    const {getMemory} = useMemories()
+
+
+
+    useEffect(()=> {
+        async function fetchMemory() {
+            let memory = await getMemory({category: infoTitles[currentPage], lookback: "DAY"})
+            console.log(memory);
+        }
+        fetchMemory().catch(console.error);
+
+
+    }, [])
+
 
 
 
@@ -77,7 +93,7 @@ export default function Info() {
                 <button className="underline text-gray-900 bg-gray-100 p-1 hover:bg-gray-500 hover:text-gray-100">Today</button>, last year, on-chain...
             </div>
 
-            <div id="info-main-container "className="relative w-3/4 h-5/6 bg-gray-500 border-2 border-gray-100 flex flex-row justify-around items-center">
+            <div id="info-main-container "className="relative w-11/12 h-5/6 bg-gray-500 border-2 border-gray-100 flex flex-row justify-around items-center">
                 <h1 className="p-2 absolute right-5 top-5 text-2xl bg-gray-100 border-2 border-gray-900">{infoTitles[currentPage]}</h1>
                 <InfoBlocks currentPage={currentPage} data={{title1: 'Foo1', section1: 'Bar1', title2: 'Foo2', section2: 'Bar2'}}/>
 

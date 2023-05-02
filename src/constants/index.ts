@@ -1,0 +1,6 @@
+export const INTERVAL_IN_SECONDS = {
+    YEAR: 31536000,
+    MONTH:2630000,
+    WEEK: 604800,
+    DAY:86400
+}
