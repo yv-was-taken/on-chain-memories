@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useMemories } from "../hooks";
 import { OnChainActivityCategory } from "../types"
 
@@ -30,15 +30,14 @@ const infoTitles: InfoTitles = {
     4: "Governance"
 }
 
-function InfoBlock({content, currentSection}:InfoBlockProps ) {
+function InfoBlock({children} : {children: ReactNode}) {
 
+
+    
 
     return(
-        <div id="info-block-container" className="bg-gray-900 h-3/4 w-2/5 flex flex-col justify-between items-center text-white">
-            <h1 className="p-10 text-lg">{content.title}</h1>
-            <div className="whitespace-normal p-10">{content.section}  </div>
-
-        </div>
+        <div id="info-block-container" className="bg-gray-900 h-5/6 w-11/12 flex flex-col justify-start items-center text-white relative bottom-7">
+            {children}        </div>
 
 
     )
@@ -46,21 +45,9 @@ function InfoBlock({content, currentSection}:InfoBlockProps ) {
 
 }
 
-type InfoBlocksProps = {
-    currentPage: number; 
-    data: { title1: string, section1: string, title2: string, section2: string}
-}
 
-function InfoBlocks({currentPage, data}: InfoBlocksProps ) {
 
-    return(
-        <>
-            <InfoBlock currentSection={infoTitles[currentPage]} content={{title: data.title1, section:data.section1}}/>
-            <InfoBlock currentSection={infoTitles[currentPage]} content={{title: data.title2, section:data.section2}}/>
-        </>
 
-    )
-}
 
 
 
@@ -70,7 +57,9 @@ function InfoBlocks({currentPage, data}: InfoBlocksProps ) {
 
 export default function Info() {
     const [currentPage,setCurrentPage] = useState(1);
+    const [memories, setMemories] = useState<any>(['loading...']); //@TODO typing
     const {getMemory} = useMemories()
+
 
 
 
@@ -78,24 +67,37 @@ export default function Info() {
         async function fetchMemory() {
             let memory = await getMemory({category: infoTitles[currentPage], lookback: "DAY"})
             console.log(memory);
+            setMemories(memory);
         }
         fetchMemory().catch(console.error);
 
 
     }, [])
 
+    
+    const Transactions = memories.map((memory: any, index: number) => {
+        return(
+            <div className="whitespace-normal p-5" key={index}>
+                {memory.hash}
+            </div>
+
+        )
+
+    }) //@TODO typing
+
 
 
 
     return(
         <div className={`relative rounded-sm mx-auto block w-full h-full  text-black flex flex-col justify-around items-center`}>
-            <div id="info-date-title" className="fixed top-6 left-24 text-gray-100 text-3xl">
-                <button className="underline text-gray-900 bg-gray-100 p-1 hover:bg-gray-500 hover:text-gray-100">Today</button>, last year, on-chain...
+            <div id="info-date-title" className="fixed z-10 bottom-32 left-28 text-gray-900 text-3xl">
+                <button className="underline text-gray-900 p-2 border-2 border-gray-900 hover:border-gray-100 hover:bg-gray-300">Today</button>, last year, on-chain...
             </div>
 
             <div id="info-main-container "className="relative w-11/12 h-5/6 bg-gray-500 border-2 border-gray-100 flex flex-row justify-around items-center">
-                <h1 className="p-2 absolute right-5 top-5 text-2xl bg-gray-100 border-2 border-gray-900">{infoTitles[currentPage]}</h1>
-                <InfoBlocks currentPage={currentPage} data={{title1: 'Foo1', section1: 'Bar1', title2: 'Foo2', section2: 'Bar2'}}/>
+                <InfoBlock>
+                    {Transactions}
+                </InfoBlock>
 
 
             </div>
